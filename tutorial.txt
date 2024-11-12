@@ -1,0 +1,185 @@
+
+import mysql.connector 
+from mysql.connector import Error
+import pandas as pd
+
+
+# def connection_with_server(host_name,server_name,server_pwd) :
+#     connection = None
+#     try:
+#         connection = mysql.connector.connect(
+#         host = host_name,
+#         user = server_name,
+#         password = server_pwd 
+#         )
+#         print("Database connection successful")
+#     except Error as err:
+#         print(f"Error : '{err}'")
+#     return connection
+        
+# ## put our server password 
+# pw = ""
+
+# ### database name 
+# db = "assignment"
+
+
+# connection= connection_with_server("localhost","root",pw)
+
+
+
+# ## creat mysql_python
+
+# def create_database(connection,query):
+#     cursor = connection.cursor()
+#     try:
+#         cursor.execute(query)
+#         print("database created successfully")
+#     except Error as err:
+#         print(f"Error: '{err}' ")
+# create_database_query = "create dataconnbase mysql_python"
+# create_database(connection ,create_database_query )
+
+
+
+
+
+def create_db_connection(host_name,user_name,user_pwd,db_name):
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+                        host = host_name,
+                        user = user_name,
+                        passwd = user_pwd,
+                        database = db_name)
+        print("connection successfully")
+    except Error as err :
+        print(f"Error :'{err} ' ")
+    return connection
+
+pwd = ""
+db = "mysql_python"
+
+## execute sql queries
+def execute_query(connection,query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+        print("query run successfully")
+    except Error as err:
+        print(f"Error: '{err}' ")
+
+
+create_table  =  """ 
+create table orders1(
+order_id int primary key,
+customer_name varchar(20) not null,
+product_name varchar(20) not null,
+order_date date,
+quentity int,
+unit_price float,
+phone_number varchar(20)
+);
+"""
+
+
+## connection to database 
+
+connection = create_db_connection("localhost","root",pwd,db)
+execute_query(connection , create_table)
+
+
+
+insert_data = """
+INSERT INTO orders1 VALUES
+    (1, 'John Doe', 'Laptop', '2024-11-01', 1, 999.99, '123-456-7890'),
+    (2, 'Jane Smith', 'Smartphone', '2024-11-02', 2, 599.99, '234-567-8901'),
+    (3, 'Alice Brown', 'Headphones', '2024-11-03', 5, 49.99, '345-678-9012');
+"""
+
+# Execute the insert query
+execute_query(connection, insert_data)
+
+
+## read data 
+def read_query(connection,query):
+    cursor = connection.cursor()
+    result = None
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+    except Error as err:
+        print(f"Error : '{err}'")
+
+
+
+q1 ="""
+select * from orders1;
+"""
+
+connection = create_db_connection("localhost","root",pwd,db)
+results = read_query(connection , q1) 
+
+for result in results : 
+    print(result)
+
+
+
+q3 ="""
+select year(order_date) from orders1;
+"""
+
+connection = create_db_connection("localhost","root",pwd,db)
+results = read_query(connection , q3) 
+
+for result in results : 
+    print(result)
+
+
+
+
+# DELETE query to remove a specific order by order_id
+delete_query = "DELETE FROM orders1 WHERE order_id = 3;"
+
+# Execute the delete query
+connection = create_db_connection("localhost","root",pwd,db)
+execute_query(connection, delete_query)
+
+
+
+q4 ="""
+select * from orders1;
+"""
+
+connection = create_db_connection("localhost","root",pwd,db)
+results = read_query(connection , q4) 
+
+for result in results : 
+    print(result)
+
+
+
+# UPDATE query to modify a record's quantity and price based on order_id
+update_query = """
+UPDATE orders1 
+SET quentity = 2, unit_price = 529.99 
+WHERE order_id = 2;
+"""
+
+# Execute the update query
+execute_query(connection, update_query)
+
+
+
+
+q5 ="""
+select * from orders1;
+"""
+
+connection = create_db_connection("localhost","root",pwd,db)
+results = read_query(connection , q5) 
+
+for result in results : 
+    print(result)
